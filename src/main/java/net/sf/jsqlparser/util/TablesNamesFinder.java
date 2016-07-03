@@ -625,4 +625,8 @@ public class TablesNamesFinder implements SelectVisitor, FromItemVisitor, Expres
     public void visit(DateTimeLiteralExpression literal) {
 
     }
+
+    @Override
+    public void visit(YADAMarkupParameter yadaMarkupParameter) {
+    }
 }

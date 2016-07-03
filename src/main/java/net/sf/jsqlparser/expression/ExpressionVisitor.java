@@ -169,4 +169,6 @@ public interface ExpressionVisitor {
 
     void visit(DateTimeLiteralExpression literal);
 
+    void visit(YADAMarkupParameter yadaMarkupParameter);
+
 }
