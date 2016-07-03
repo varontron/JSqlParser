@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.github.jsqlparser</groupId>
+  <artifactId>jsqlparser</artifactId>
+  <versioning>
+    <versions>
+      <version>0.9.6-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20160703222610</lastUpdated>
+  </versioning>
+</metadata>
