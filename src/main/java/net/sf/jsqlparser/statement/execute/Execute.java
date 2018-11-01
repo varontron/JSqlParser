@@ -21,6 +21,7 @@
  */
 package net.sf.jsqlparser.statement.execute;
 
+import java.util.List;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
@@ -32,6 +33,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  */
 public class Execute implements Statement {
 
+    private EXEC_TYPE execType = EXEC_TYPE.EXECUTE;
     private String name;
     private ExpressionList exprList;
 
@@ -43,6 +45,16 @@ public class Execute implements Statement {
         this.name = name;
     }
 
+    public void setName(List<String> names) {
+        for (String item : names) {
+            if (this.name != null) {
+                this.name = this.name + "." + item;
+            } else {
+                this.name = item;
+            }
+        }
+    }
+
     public ExpressionList getExprList() {
         return exprList;
     }
@@ -50,7 +62,15 @@ public class Execute implements Statement {
     public void setExprList(ExpressionList exprList) {
         this.exprList = exprList;
     }
-    
+
+    public EXEC_TYPE getExecType() {
+        return execType;
+    }
+
+    public void setExecType(EXEC_TYPE execType) {
+        this.execType = execType;
+    }
+
     @Override
     public void accept(StatementVisitor statementVisitor) {
         statementVisitor.visit(this);
@@ -58,7 +78,15 @@ public class Execute implements Statement {
 
     @Override
     public String toString() {
-        return "EXECUTE " + name + " " + PlainSelect.getStringList(exprList.getExpressions(), true, false);
+        return execType.name() + " " + name
+                + (exprList != null && exprList.getExpressions() != null ? " "
+                + PlainSelect.getStringList(exprList.getExpressions(), true, false) : "");
+    }
+
+    public static enum EXEC_TYPE {
+        EXECUTE,
+        EXEC,
+        CALL
     }
 
 }

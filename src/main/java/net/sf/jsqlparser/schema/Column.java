@@ -21,6 +21,7 @@
  */
 package net.sf.jsqlparser.schema;
 
+import java.util.List;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.parser.ASTNodeAccessImpl;
 
@@ -38,6 +39,12 @@ public final class Column extends ASTNodeAccessImpl implements Expression, Multi
     public Column(Table table, String columnName) {
         setTable(table);
         setColumnName(columnName);
+    }
+
+    public Column(List<String> nameParts) {
+        this(nameParts.size() > 1
+                ? new Table(nameParts.subList(0, nameParts.size() - 1)) : null,
+                nameParts.get(nameParts.size() - 1));
     }
 
     public Column(String columnName) {
@@ -62,12 +69,26 @@ public final class Column extends ASTNodeAccessImpl implements Expression, Multi
 
     @Override
     public String getFullyQualifiedName() {
+        return getName(false);
+    }
+
+    /**
+     * Get name with out without using aliases.
+     *
+     * @param aliases
+     * @return
+     */
+    public String getName(boolean aliases) {
         StringBuilder fqn = new StringBuilder();
 
         if (table != null) {
-            fqn.append(table.getFullyQualifiedName());
+            if (table.getAlias() != null && aliases) {
+                fqn.append(table.getAlias().getName());
+            } else {
+                fqn.append(table.getFullyQualifiedName());
+            }
         }
-        if (fqn.length()>0) {
+        if (fqn.length() > 0) {
             fqn.append('.');
         }
         if (columnName != null) {
@@ -83,6 +104,6 @@ public final class Column extends ASTNodeAccessImpl implements Expression, Multi
 
     @Override
     public String toString() {
-        return getFullyQualifiedName();
+        return getName(true);
     }
 }

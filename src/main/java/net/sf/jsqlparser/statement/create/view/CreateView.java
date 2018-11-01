@@ -26,93 +26,121 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectBody;
+import net.sf.jsqlparser.statement.select.Select;
 
 /**
  * A "CREATE VIEW" statement
  */
 public class CreateView implements Statement {
 
-	private Table view;
-	private SelectBody selectBody;
-	private boolean orReplace = false;
-	private List<String> columnNames = null;
-	private boolean materialized = false;
+    private Table view;
+    private Select select;
+    private boolean orReplace = false;
+    private List<String> columnNames = null;
+    private boolean materialized = false;
+    private ForceOption force = ForceOption.NONE;
+    private TemporaryOption temp = TemporaryOption.NONE;
 
-	@Override
-	public void accept(StatementVisitor statementVisitor) {
-		statementVisitor.visit(this);
-	}
+    @Override
+    public void accept(StatementVisitor statementVisitor) {
+        statementVisitor.visit(this);
+    }
 
-	/**
-	 * In the syntax tree, a view looks and acts just like a Table.
-	 *
-	 * @return The name of the view to be created.
-	 */
-	public Table getView() {
-		return view;
-	}
+    /**
+     * In the syntax tree, a view looks and acts just like a Table.
+     *
+     * @return The name of the view to be created.
+     */
+    public Table getView() {
+        return view;
+    }
 
-	public void setView(Table view) {
-		this.view = view;
-	}
+    public void setView(Table view) {
+        this.view = view;
+    }
 
-	/**
-	 * @return was "OR REPLACE" specified?
-	 */
-	public boolean isOrReplace() {
-		return orReplace;
-	}
+    /**
+     * @return was "OR REPLACE" specified?
+     */
+    public boolean isOrReplace() {
+        return orReplace;
+    }
 
-	/**
-	 * @param orReplace was "OR REPLACE" specified?
-	 */
-	public void setOrReplace(boolean orReplace) {
-		this.orReplace = orReplace;
-	}
+    /**
+     * @param orReplace was "OR REPLACE" specified?
+     */
+    public void setOrReplace(boolean orReplace) {
+        this.orReplace = orReplace;
+    }
 
-	/**
-	 * @return the SelectBody
-	 */
-	public SelectBody getSelectBody() {
-		return selectBody;
-	}
+    public Select getSelect() {
+        return select;
+    }
 
-	public void setSelectBody(SelectBody selectBody) {
-		this.selectBody = selectBody;
-	}
+    public void setSelect(Select select) {
+        this.select = select;
+    }
 
-	public List<String> getColumnNames() {
-		return columnNames;
-	}
+    public List<String> getColumnNames() {
+        return columnNames;
+    }
 
-	public void setColumnNames(List<String> columnNames) {
-		this.columnNames = columnNames;
-	}
+    public void setColumnNames(List<String> columnNames) {
+        this.columnNames = columnNames;
+    }
 
-	public boolean isMaterialized() {
-		return materialized;
-	}
+    public boolean isMaterialized() {
+        return materialized;
+    }
 
-	public void setMaterialized(boolean materialized) {
-		this.materialized = materialized;
-	}
+    public void setMaterialized(boolean materialized) {
+        this.materialized = materialized;
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sql = new StringBuilder("CREATE ");
-		if (isOrReplace()) {
-			sql.append("OR REPLACE ");
-		}
-		if (isMaterialized()) {
-			sql.append("MATERIALIZED ");
-		}
-		sql.append("VIEW ");
-		sql.append(view);
-		if (columnNames != null) {
-			sql.append(PlainSelect.getStringList(columnNames, true, true));
-		}
-		sql.append(" AS ").append(selectBody);
-		return sql.toString();
-	}
+    public ForceOption getForce() {
+        return force;
+    }
+
+    public void setForce(ForceOption force) {
+        this.force = force;
+    }
+
+    public TemporaryOption getTemporary() {
+        return temp;
+    }
+
+    public void setTemporary(TemporaryOption temp) {
+        this.temp = temp;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sql = new StringBuilder("CREATE ");
+        if (isOrReplace()) {
+            sql.append("OR REPLACE ");
+        }
+        switch (force) {
+            case FORCE:
+                sql.append("FORCE ");
+                break;
+            case NO_FORCE:
+                sql.append("NO FORCE ");
+                break;
+        }
+        
+        if (temp != TemporaryOption.NONE) {
+            sql.append(temp.name()).append(" ");
+        }
+        
+        if (isMaterialized()) {
+            sql.append("MATERIALIZED ");
+        }
+        sql.append("VIEW ");
+        sql.append(view);
+        if (columnNames != null) {
+            sql.append(PlainSelect.getStringList(columnNames, true, true));
+        }
+        sql.append(" AS ").append(select);
+        return sql.toString();
+    }
 }

@@ -35,38 +35,48 @@ import net.sf.jsqlparser.statement.replace.Replace;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.upsert.Upsert;
 
 public interface StatementVisitor {
 
-	void visit(Select select);
+    void visit(Commit commit);
 
-	void visit(Delete delete);
+    void visit(Delete delete);
 
-	void visit(Update update);
+    void visit(Update update);
 
-	void visit(Insert insert);
+    void visit(Insert insert);
 
-	void visit(Replace replace);
+    void visit(Replace replace);
 
-	void visit(Drop drop);
+    void visit(Drop drop);
 
-	void visit(Truncate truncate);
+    void visit(Truncate truncate);
 
-	void visit(CreateIndex createIndex);
+    void visit(CreateIndex createIndex);
 
-	void visit(CreateTable createTable);
+    void visit(CreateTable createTable);
 
-	void visit(CreateView createView);
-    
+    void visit(CreateView createView);
+
     void visit(AlterView alterView);
-	
-	void visit(Alter alter);
-    
+
+    void visit(Alter alter);
+
     void visit(Statements stmts);
-    
+
     void visit(Execute execute);
-    
+
     void visit(SetStatement set);
-    
+
     void visit(Merge merge);
+
+    void visit(Select select);
+
+    void visit(Upsert upsert);
+
+    void visit(UseStatement use);
+
+    void visit(Block block);
+
 }

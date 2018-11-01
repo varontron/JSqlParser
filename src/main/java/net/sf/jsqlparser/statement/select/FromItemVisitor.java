@@ -25,15 +25,17 @@ import net.sf.jsqlparser.schema.Table;
 
 public interface FromItemVisitor {
 
-	void visit(Table tableName);
+    void visit(Table tableName);
 
-	void visit(SubSelect subSelect);
+    void visit(SubSelect subSelect);
 
-	void visit(SubJoin subjoin);
+    void visit(SubJoin subjoin);
 
-	void visit(LateralSubSelect lateralSubSelect);
+    void visit(LateralSubSelect lateralSubSelect);
 
-	void visit(ValuesList valuesList);
+    void visit(ValuesList valuesList);
 
-	void visit(TableFunction tableFunction);
+    void visit(TableFunction tableFunction);
+
+    public void visit(ParenthesisFromItem aThis);
 }

@@ -28,11 +28,12 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
+import net.sf.jsqlparser.parser.ASTNodeAccessImpl;
 
 /**
  * A subselect followed by an optional alias.
  */
-public class SubSelect implements FromItem, Expression, ItemsList {
+public class SubSelect extends ASTNodeAccessImpl implements FromItem, Expression, ItemsList {
 
     private SelectBody selectBody;
     private Alias alias;
@@ -86,7 +87,7 @@ public class SubSelect implements FromItem, Expression, ItemsList {
     public void setUseBrackets(boolean useBrackets) {
         this.useBrackets = useBrackets;
     }
-    
+
     public List<WithItem> getWithItemsList() {
         return withItemsList;
     }
@@ -103,8 +104,9 @@ public class SubSelect implements FromItem, Expression, ItemsList {
     @Override
     public String toString() {
         StringBuilder retval = new StringBuilder();
-        if (useBrackets)
+        if (useBrackets) {
             retval.append("(");
+        }
         if (withItemsList != null && !withItemsList.isEmpty()) {
             retval.append("WITH ");
             for (Iterator<WithItem> iter = withItemsList.iterator(); iter.hasNext();) {
@@ -117,16 +119,17 @@ public class SubSelect implements FromItem, Expression, ItemsList {
             }
         }
         retval.append(selectBody);
-        if (useBrackets)
+        if (useBrackets) {
             retval.append(")");
-                
-        if (pivot != null) {
-            retval.append(" ").append(pivot);
         }
+
         if (alias != null) {
             retval.append(alias.toString());
         }
-        
+        if (pivot != null) {
+            retval.append(" ").append(pivot);
+        }
+
         return retval.toString();
     }
 }

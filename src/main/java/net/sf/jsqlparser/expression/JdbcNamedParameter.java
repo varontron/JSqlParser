@@ -21,34 +21,38 @@
  */
 package net.sf.jsqlparser.expression;
 
+import net.sf.jsqlparser.parser.ASTNodeAccessImpl;
+
 /**
  *
  * @author aud
  */
-public class JdbcNamedParameter implements Expression {
+public class JdbcNamedParameter extends ASTNodeAccessImpl implements Expression {
 
-	private String name;
+    private String name;
 
-	/**
-	 * The name of the parameter
-	 *
-	 * @return the name of the parameter
-	 */
-	public String getName() {
-		return name;
-	}
+    public JdbcNamedParameter() {
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public JdbcNamedParameter(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		return ":" + name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void accept(ExpressionVisitor expressionVisitor) {
+        expressionVisitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return ":" + name;
+    }
 }

@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-/*
+ /*
  * Copyright (C) 2016 JSQLParser.
  *
  * This library is free software; you can redistribute it and/or
@@ -39,11 +39,14 @@
  */
 package net.sf.jsqlparser.expression;
 
+import net.sf.jsqlparser.parser.ASTNodeAccessImpl;
+
 /**
  *
  * @author toben
  */
-public class DateTimeLiteralExpression implements Expression {
+public class DateTimeLiteralExpression extends ASTNodeAccessImpl implements Expression {
+
     private String value;
     private DateTime type;
 
@@ -72,7 +75,7 @@ public class DateTimeLiteralExpression implements Expression {
     public String toString() {
         return type.name() + " " + value;
     }
-    
+
     public static enum DateTime {
         DATE, TIME, TIMESTAMP;
     }

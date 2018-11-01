@@ -21,31 +21,33 @@
  */
 package net.sf.jsqlparser.expression;
 
+import net.sf.jsqlparser.parser.ASTNodeAccessImpl;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
 import java.util.List;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 
 /**
- * Analytic function. The name of the function is variable but the parameters
- * following the special analytic function path. e.g. row_number() over (order
- * by test). Additional there can be an expression for an analytical aggregate
- * like sum(col) or the "all collumns" wildcard like count(*).
+ * Analytic function. The name of the function is variable but the parameters following the special
+ * analytic function path. e.g. row_number() over (order by test). Additional there can be an
+ * expression for an analytical aggregate like sum(col) or the "all collumns" wildcard like
+ * count(*).
  *
  * @author tw
  */
-public class AnalyticExpression implements Expression {
+public class AnalyticExpression extends ASTNodeAccessImpl implements Expression {
 
-    private ExpressionList partitionExpressionList;
-    private List<OrderByElement> orderByElements;
+    private final OrderByClause orderBy = new OrderByClause();
+    private final PartitionByClause partitionBy = new PartitionByClause();
     private String name;
     private Expression expression;
     private Expression offset;
     private Expression defaultValue;
     private boolean allColumns = false;
-    private WindowElement windowElement;
     private KeepExpression keep = null;
+    private AnalyticType type = AnalyticType.OVER;
+    private boolean distinct = false;
+    private boolean ignoreNulls = false;
 
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
@@ -53,11 +55,11 @@ public class AnalyticExpression implements Expression {
     }
 
     public List<OrderByElement> getOrderByElements() {
-        return orderByElements;
+        return orderBy.getOrderByElements();
     }
 
     public void setOrderByElements(List<OrderByElement> orderByElements) {
-        this.orderByElements = orderByElements;
+        orderBy.setOrderByElements(orderByElements);
     }
 
     public KeepExpression getKeep() {
@@ -69,11 +71,11 @@ public class AnalyticExpression implements Expression {
     }
 
     public ExpressionList getPartitionExpressionList() {
-        return partitionExpressionList;
+        return partitionBy.getPartitionExpressionList();
     }
 
     public void setPartitionExpressionList(ExpressionList partitionExpressionList) {
-        this.partitionExpressionList = partitionExpressionList;
+        partitionBy.setPartitionExpressionList(partitionExpressionList);
     }
 
     public String getName() {
@@ -109,11 +111,35 @@ public class AnalyticExpression implements Expression {
     }
 
     public WindowElement getWindowElement() {
-        return windowElement;
+        return orderBy.getWindowElement();
     }
 
     public void setWindowElement(WindowElement windowElement) {
-        this.windowElement = windowElement;
+        orderBy.setWindowElement(windowElement);
+    }
+
+    public AnalyticType getType() {
+        return type;
+    }
+
+    public void setType(AnalyticType type) {
+        this.type = type;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    public boolean isIgnoreNulls() {
+        return ignoreNulls;
+    }
+
+    public void setIgnoreNulls(boolean ignoreNulls) {
+        this.ignoreNulls = ignoreNulls;
     }
 
     @Override
@@ -121,6 +147,9 @@ public class AnalyticExpression implements Expression {
         StringBuilder b = new StringBuilder();
 
         b.append(name).append("(");
+        if (isDistinct()) {
+            b.append("DISTINCT ");
+        }
         if (expression != null) {
             b.append(expression.toString());
             if (offset != null) {
@@ -132,14 +161,25 @@ public class AnalyticExpression implements Expression {
         } else if (isAllColumns()) {
             b.append("*");
         }
+        if (isIgnoreNulls()) {
+            b.append(" IGNORE NULLS");
+        }
         b.append(") ");
         if (keep != null) {
             b.append(keep.toString()).append(" ");
         }
-        b.append("OVER (");
 
-        toStringPartitionBy(b);
-        toStringOrderByElements(b);
+        switch (type) {
+            case WITHIN_GROUP:
+                b.append("WITHIN GROUP");
+                break;
+            default:
+                b.append("OVER");
+        }
+        b.append(" (");
+
+        partitionBy.toStringPartitionBy(b);
+        orderBy.toStringOrderByElements(b);
 
         b.append(")");
 
@@ -154,28 +194,4 @@ public class AnalyticExpression implements Expression {
         this.allColumns = allColumns;
     }
 
-    private void toStringPartitionBy(StringBuilder b) {
-        if (partitionExpressionList != null && !partitionExpressionList.getExpressions().isEmpty()) {
-            b.append("PARTITION BY ");
-            b.append(PlainSelect.getStringList(partitionExpressionList.getExpressions(), true, false));
-            b.append(" ");
-        }
-    }
-
-    private void toStringOrderByElements(StringBuilder b) {
-        if (orderByElements != null && !orderByElements.isEmpty()) {
-            b.append("ORDER BY ");
-            for (int i = 0; i < orderByElements.size(); i++) {
-                if (i > 0) {
-                    b.append(", ");
-                }
-                b.append(orderByElements.get(i).toString());
-            }
-
-            if (windowElement != null) {
-                b.append(' ');
-                b.append(windowElement);
-            }
-        }
-    }
 }

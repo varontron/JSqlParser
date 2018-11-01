@@ -21,6 +21,7 @@
  */
 package net.sf.jsqlparser.expression.operators.relational;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.Expression;
@@ -31,30 +32,34 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  */
 public class ExpressionList implements ItemsList {
 
-	private List<Expression> expressions;
+    private List<Expression> expressions;
 
-	public ExpressionList() {
-	}
+    public ExpressionList() {
+    }
 
-	public ExpressionList(List<Expression> expressions) {
-		this.expressions = expressions;
-	}
+    public ExpressionList(List<Expression> expressions) {
+        this.expressions = expressions;
+    }
+    
+    public ExpressionList(Expression ... expressions) {
+        this.expressions = Arrays.asList(expressions);
+    }
 
-	public List<Expression> getExpressions() {
-		return expressions;
-	}
+    public List<Expression> getExpressions() {
+        return expressions;
+    }
 
-	public void setExpressions(List<Expression> list) {
-		expressions = list;
-	}
+    public void setExpressions(List<Expression> list) {
+        expressions = list;
+    }
 
-	@Override
-	public void accept(ItemsListVisitor itemsListVisitor) {
-		itemsListVisitor.visit(this);
-	}
+    @Override
+    public void accept(ItemsListVisitor itemsListVisitor) {
+        itemsListVisitor.visit(this);
+    }
 
-	@Override
-	public String toString() {
-		return PlainSelect.getStringList(expressions, true, true);
-	}
+    @Override
+    public String toString() {
+        return PlainSelect.getStringList(expressions, true, true);
+    }
 }
